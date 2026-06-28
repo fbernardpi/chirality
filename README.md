@@ -24,7 +24,7 @@ conda install -c fvcore -c iopath -c conda-forge fvcore iopath
 conda install pytorch3d::pytorch3d meshplot
 pip3 install ./third_party/ODISE 
 pip3 install ./third_party/Mask2Former 
-pip3 install diffusers==0.21.4 huggingface_hub==0.17.3 transformers==4.34.1 opencv-python==4.6.0.66 scikit-learn matplotlib numpy==1.25.0 plyfile trimesh potpourri3d robust-laplacian open3d accelerate==0.20.3 pillow==9.5.0 timm==0.6.11
+pip3 install diffusers==0.21.4 huggingface_hub==0.17.3 transformers==4.34.1 opencv-python==4.6.0.66 scikit-learn matplotlib numpy==1.25.0 plyfile trimesh potpourri3d robust-laplacian open3d accelerate==0.20.3 pillow==9.5.0 timm==0.6.11 networkx
 ```
 
 ## Data download & preparation:
@@ -34,9 +34,11 @@ Then precompute all necessary features using (for example).
 ./generate_images.py <dataset_name> <split> <idx>
 ./generate_features.py <dataset_name> <split> <idx>
 ```
-For 3dv version only:
+For the 3DV version, additionally precompute the line graph (required for training) and the
+geodesic distances (required for the correspondence evaluation):
 ```shell
-./generate_conjugate.py <dataset_name> <split> <idx>
+./generate_conjugate.py <data_root> <split> <idx>   # writes {0,1}_line_graph.pt
+./generate_geodesic.py <data_root> <split> <idx>    # writes {0,1}_geodesics.pt
 ```
 
 ## Usage
@@ -49,12 +51,28 @@ CUBLAS_WORKSPACE_CONFIG=:16:8 python3 ./chi.py --train <data_folder> all --test 
 
 Evaluating the provided model:
 ```shell
-CUBLAS_WORKSPACE_CONFIG=:16:8 python3 ./chi.py --test <data_folder> all --pretrained ./pretrained/becos_full/
+CUBLAS_WORKSPACE_CONFIG=:16:8 python3 ./chi.py --test <data_folder> all --pretrained ./pretrained/iccv/
 ```
 
 
 ### Symmetry Informative and Agnostic Feature Disentanglement for 3D Shapes [3DV 2026]
-Full code and details will be released soon
+
+Make sure the features (`generate_images.py` / `generate_features.py`), line graphs
+(`generate_conjugate.py`) and geodesics (`generate_geodesic.py`) have been precomputed for the
+dataset, then:
+
+Training a model from scratch (with testing):
+```shell
+python3 ./chi_3dv.py --train <data_folder> all --test <data_folder> all --save_path <out_dir>
+```
+
+Evaluating the provided model:
+```shell
+python3 ./chi_3dv.py --test <data_folder> all --pretrained ./pretrained/3dv/
+```
+
+This reports per-shape chirality accuracy together with the full-shape and left/right
+correspondence matching metrics (`mean_matching_acc@{1,5,10}%`, AUC) and the combined objective.
 
 ## BibTeX
 

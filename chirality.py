@@ -32,7 +32,7 @@ class ChiralityMLP(nn.Module):
 			self.backward_model = torchvision.ops.MLP(feature_size, [feature_size] * num_layers)
 
 class ChiralityDisentangler(nn.Module):
-	def __init__(self, feature_size, num_layers, model_type, normalization, chirality_dim = 1, force_orthogonal = False, skip_connection = False):
+	def __init__(self, feature_size, num_layers, model_type, normalization, chirality_dim = 1, force_orthogonal = False, skip_connection = False, enable_non_chiral = True):
 		super(ChiralityDisentangler, self).__init__()
 		
 		assert model_type in ["invertible", "mlp"]
@@ -51,9 +51,14 @@ class ChiralityDisentangler(nn.Module):
 
 		self.new_feature_dim = chirality_dim
 		self.skip_connection = skip_connection
-	
+		self.enable_non_chiral = enable_non_chiral
+
 
 	def forward(self, x, return_backward = False):
+		inp = x
+		if not self.enable_non_chiral:
+			x = x.clone()
+
 		x = self.m.forward_model(x) + x if self.skip_connection else self.m.forward_model(x)
 
 		forward_features = x.clone()
@@ -76,6 +81,9 @@ class ChiralityDisentangler(nn.Module):
 
 		if self.normalization == "beforeAndAfter":
 			non_chiral = torch.nn.functional.normalize(non_chiral, dim = -1)
+
+		if not self.enable_non_chiral:
+			non_chiral = inp
 
 		if return_backward:
 			return chiral, non_chiral, forward_features, backward_features
