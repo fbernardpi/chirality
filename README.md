@@ -10,10 +10,12 @@ This repository includes code for both "Chi: Symmetry Understanding of 3D Shapes
 [Project Webpage](https://diff3f.github.io/) | [Paper](https://arxiv.org/pdf/2508.05505)
 
 ## Symmetry Informative and Agnostic Feature Disentanglement for 3D Shapes [3DV 2026]
--- More details coming soon --
+<a href='https://tweissberg.github.io/chirality/'><img src='https://img.shields.io/badge/Project-Page-green'></a>  [![ArXiv](https://img.shields.io/badge/arXiv-2601.14804-b31b1b.svg)](https://arxiv.org/pdf/2601.14804)
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
 
 ![](assets/3dv_teaser.png)
+
+[Project Webpage](https://tweissberg.github.io/chirality/) | [Paper](https://arxiv.org/pdf/2601.14804)
 
 ## Setup
 ```shell
